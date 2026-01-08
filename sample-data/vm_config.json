@@ -1,0 +1,25 @@
+{
+    "data": {
+        "memory": 4096,
+        "onboot": 1,
+        "rng0": "source=/dev/urandom",
+        "boot": "order=scsi0;ide2;net0",
+        "sockets": 1,
+        "ostype": "l26",
+        "bios": "ovmf",
+        "name": "docker01",
+        "cpu": "x86-64-v2-AES",
+        "net0": "virtio=82:F5:7D:CA:2E:9D,bridge=vmbr0",
+        "meta": "creation-qemu=8.0.2,ctime=1724324107",
+        "scsihw": "virtio-scsi-single",
+        "parent": "Pre-Plugin",
+        "numa": 0,
+        "ide2": "local:iso/veeam-recovery-media-6.1.2.1781_x86_64.iso,media=cdrom,size=649M",
+        "agent": "1",
+        "digest": "585963c094c65573b83b52cb913bdd2bfd1c4fed",
+        "smbios1": "uuid=0ba26b8f-1baf-4fdd-92be-bc7562d20c18",
+        "vmgenid": "9bc74269-94a3-49ca-9b21-494417ede42a",
+        "scsi0": "local-lvm:vm-101-disk-0,iothread=1,size=500G",
+        "cores": 2
+    }
+}
