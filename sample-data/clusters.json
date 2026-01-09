@@ -1,0 +1,14 @@
+{
+    "data": [
+        {
+            "ip": "192.168.102.21",
+            "local": 1,
+            "type": "node",
+            "online": 1,
+            "nodeid": 0,
+            "name": "proxmox",
+            "id": "node/proxmox",
+            "level": ""
+        }
+    ]
+}
