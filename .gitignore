@@ -12,3 +12,4 @@ configuration/ldap/*
 !configuration/plugins.py
 super-linter.log
 venv/
+pynetbox_demo.py

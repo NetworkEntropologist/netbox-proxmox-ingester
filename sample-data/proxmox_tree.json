@@ -1,0 +1,68 @@
+{
+  "pin_mode": "c",
+  "cluster": {
+    "name": "demo",
+    "id": "cluster",
+    "type": "cluster",
+    "nodes": 1
+  },
+  "nodes": [
+    {
+      "node": "proxmox",
+      "id": "node/proxmox",
+      "type": "node",
+      "status": "online"
+    }
+  ],
+  "vms": [
+    {
+      "name": "slurpit",
+      "ram": 4096,
+      "cpu": 2
+    },
+    {
+      "name": "docker01",
+      "ram": 4096,
+      "cpu": 2,
+      "disks": [
+        {
+          "ide2": 664576
+        },
+        {
+          "scsi0": 512000
+        }
+      ],
+      "network": [
+        {
+          "mac": "82:F5:7D:CA:2E:9D",
+          "name": "ens18",
+          "ips": [
+            {
+              "family": "ipv4",
+              "address": "10.12.40.15/24"
+            },
+            {
+              "family": "ipv6",
+              "address": "fe80::80f5:7dff:feca:2e9d/64"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CONDNS",
+      "ram": 1024,
+      "cpu": 1
+    },
+    {
+      "name": "FMG",
+      "ram": 4096,
+      "cpu": 2
+    },
+    {
+      "name": "Ansible",
+      "ram": 2048,
+      "cpu": 2
+    }
+  ]
+}
