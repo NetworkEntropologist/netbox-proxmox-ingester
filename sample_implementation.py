@@ -464,6 +464,29 @@ def validate_vm(vm_name: str) -> bool:
     
     return True # VM exists
 
+def validate_ip(ip_address: str) -> int:
+    """
+    Check if an IP Address exists
+
+    Args:
+        ip_address (str): IP Address to validate
+    
+    Returns:
+        int: Object ID if address exists, 0 if not
+    """
+
+    # Check if the address exists
+    try:
+        results = netbox_api.ipam.ip_addresses.get(address=ip_address)
+    except ConnectionError as e:
+        print(f'Error connecting to NetBox API: {e}')
+        return 0
+    
+    if results:
+        return results['id']
+    
+    return 0
+
 def create_cluster_type() -> bool:
     """Create new cluster type"""
     global netbox_api
@@ -567,19 +590,15 @@ def create_vm(vm_details: dict) -> int:
     print(f'VM {vm_details["name"]} created with ID {vm_id}')
     
     # Next we create vNICs and assign them to the VM
-    if vm_details['network']:
+    if 'network' in vm_details:
         for vnic in vm_details['network']:
             create_vnic(name=vnic['name'], mac=vnic['mac'], vm_id=vm_id)
 
-    # And now we need to create an IP Address and assign it to the vNIC
+        # And now we need to create an IP Address and assign it to the vNIC
+
+
     # Next, create the virtual disk
     # And finally, link it to the VM
-
-    # Then create the vNIC interface
-
-    # Now create a new VM disk
-
-    # Finally add the VM disk to the VM
 
     return vm_id # There was some or other error
 
@@ -596,11 +615,58 @@ def create_vnic(name: str, mac: str, vm_id: int) -> int:
         int: The created vNIC ID
     """
 
-    ...
+    # First check/create MAC object ID
+    mac_id = create_mac(mac_address=mac)
 
-def create_mac():
+    try:
+        results = netbox_api.virtualization.interfaces.create(virtual_machine=vm_id,
+                                                            name=name,
+                                                            primary_mac_address=mac_id)
+        
+    except ConnectionError as e:
+        print(f'Error connecting to NetBox API: {e}')
+        return 0
+    
+    return results['id'] 
 
-    ...
+def create_mac(mac_address: str) -> int:
+    """
+    Create a new MAC Address
+    
+    Args:
+        mac_address (str): The MAC Address to create
+    
+    Returns:
+        int: The created MAC Address ID
+    """
+
+    # First check if this MAC Address exists
+    try:
+        results = netbox_api.dcim.mac_addresses.get(mac_address=mac_address)
+    except ConnectionError as e:
+        print(f'Error connecting to NetBox API: {e}')
+        return 0
+
+    if results:
+        # Return the object ID
+        return results['id']
+    
+    # Now, add a new MAC Address
+    try:
+        results = netbox_api.dcim.mac_addresses.create(mac_address=mac_address)
+    except ConnectionError as e:
+        print(f'Error connecting to NetBox API: {e}')
+        return 0
+
+    # And return the object ID
+    return results['id']
+
+def create_ip(ip_address: str, vm_id: int):
+    """
+    Create a new IP address
+    """
+
+    # TODO: Add IP Address creation logic
 
 # === Helper methods end here ===
 
@@ -665,8 +731,8 @@ for node in data_tree['nodes']:
 
         data_tree['vms'].append(_vm_data)
 
-# print('The following VM data was discovered:')
-# print(json.dumps(data_tree, indent=2))
+print('The following VM data was discovered:')
+print(json.dumps(data_tree, indent=2))
 
 ingest_to_netbox = input('Do you want to ingest this into NetBox? [y/N] ').lower()
 if ingest_to_netbox == 'y':
