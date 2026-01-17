@@ -289,7 +289,13 @@ def extract_vm_disks(vm_config: dict) -> list:
     for key, value in vm_config.items():
         _disk = {}
         if (key.startswith('ide') or key.startswith('scsi')) and not key.startswith('scsihw') : # Indicates a storage device
-            _size = int(str(value).split('size=')[1][:-1]) * 1024 # Size in MB
+            _size_raw = int(str(value).split('size=')[1][:-1])
+            _size = 0
+            # Check if the size is shown in MB or GB
+            if value.endswith('M'):
+                _size = _size_raw
+            elif value.endswith('G'):
+                _size = _size_raw * 1024
             _disk[key] = _size
             _disks.append(_disk)
     
