@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "netbox-proxmox-ingester"
+version = "0.1.0"
+description = "A NetBox plugin backend library for importing VMs and IPs"
+authors = [
+    { name = "The Network Entropologist", url = "https://github.com/NetworkEntropologist" }
+]
+license = { text = "Apache-2.0" }
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "proxmoxer==2.2.0",
+    "pynetbox==7.5.0",
+]
+
+[project.scripts]
+netbox-vm-importer = "cli:main"
