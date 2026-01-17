@@ -1,3 +1,22 @@
+"""
+Copyright 2026 The Network Entropologist
+
+https://github.com/NetworkEntropologist
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+SPDX-License-Identifier: Apache-2.0
+"""
 
 from proxmoxer import ProxmoxAPI
 
@@ -317,8 +336,6 @@ def extract_ip_details(vnic: str, vm_network: list) -> list:
 
     _ip_details = []
 
-    # TODO: Tweak the IP Address finding logic to make it actually bloody work!
-
     # Iterate through the provided list to find the specified vNIC
     for nic in vm_network:
         # First find the section relating to this MAC.
@@ -592,13 +609,19 @@ def create_vm(vm_details: dict) -> int:
     # Next we create vNICs and assign them to the VM
     if 'network' in vm_details:
         for vnic in vm_details['network']:
-            create_vnic(name=vnic['name'], mac=vnic['mac'], vm_id=vm_id)
+            vnic_id = create_vnic(name=vnic['name'], mac=vnic['mac'], vm_id=vm_id)
 
         # And now we need to create an IP Address and assign it to the vNIC
-
+            for ip in vnic['ips']:
+                create_ip(ip_address=ip['address'], interface_id=vnic_id)
 
     # Next, create the virtual disk
-    # And finally, link it to the VM
+    if 'disks' in vm_details:
+        for disk in vm_details['disks']:
+            for disk_name, disk_size in disk.items():
+                create_disk(name=disk_name, vm_id=vm_id, size=disk_size)
+                print(f'Created disk {disk_name} of size {disk_size} MB for VM ID {vm_id}')
+    
 
     return vm_id # There was some or other error
 
@@ -661,12 +684,57 @@ def create_mac(mac_address: str) -> int:
     # And return the object ID
     return results['id']
 
-def create_ip(ip_address: str, vm_id: int):
+def create_ip(ip_address: str, interface_id: int):
     """
     Create a new IP address
     """
 
     # TODO: Add IP Address creation logic
+
+    # Validate the IP does not exist yet
+    ip_id = validate_ip(ip_address=ip_address)
+
+    # If it does exist, return the object ID
+    if ip_id != 0:
+        print(f'IP Address {ip_address} already exists with ID {ip_id}')
+        return ip_id
+    
+    # Now create an IP Address and return the object ID
+    try:
+        results = netbox_api.ipam.ip_addresses.create(address=ip_address,
+                                                      assigned_object_type='virtualization.vminterface',
+                                                    assigned_object_id=interface_id,
+                                                    status='active')
+        return results['id']
+    except ConnectionError as e:
+        print(f'Error connecting to NetBox API: {e}')
+        return 0
+
+
+    return 0 # There was an error
+
+def create_disk(name: str, vm_id: int, size: int) -> int:
+    """
+    Create a new Disk in NetBox
+
+    Args:
+        name (str): The disk name
+        vm_id (int): The VM NetBox ID
+        size (int): The disk size in MB
+
+    Returns:
+        int: The created Disk ID
+    """
+
+    try:
+        results = netbox_api.virtualization.virtual_disks.create(virtual_machine=vm_id,
+                                                        name=name,
+                                                        size=size)
+    except ConnectionError as e:
+        print(f'Error connecting to NetBox API: {e}')
+        return 0
+    
+    return results['id']
 
 # === Helper methods end here ===
 
