@@ -55,7 +55,11 @@ At a hight level, the process flow is as follows:
 7. Validate that nodes exist as NetBox devices.
 8. Validate if the *Proxmox* cluster type exists. It will be created if it does not.
 9. Validate if the clusters exist as NetBox Virtualisation Clusters. If not these will be created.
-10. Create each VM, along with its associated objects.
+10. Create each VM, along with its associated objects in the following order:
+    - Virtual Machine
+    - MAC Address (If NetBox version >= 4.2)
+    - vNIC (With MAC Address if NetBox version < 4.2)
+    - Virtual Disk
 
 ### Virtual Network Configuration
 Please note that as of NetBox version 4.2, MAC Addresses are now a separate object. This script 
