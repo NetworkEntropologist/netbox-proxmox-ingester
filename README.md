@@ -31,6 +31,8 @@ flow:
 The PoC exists to prove that this flow works reliably before the codebase is
 refactored into a clean, installable library with a stable CLI interface.
 
+For more information on this PoC, please see the `sample-implementation` directory.
+
 ## What this project does (and will do)
 The ingestion process focuses on the following high-level stages:
 

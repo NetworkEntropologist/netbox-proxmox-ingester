@@ -64,8 +64,7 @@ data_tree = {
     'vms' : [],
 }
 
-netbox_api = pynetbox.api(url='localhost',
-                          token='000')
+netbox_api = pynetbox.api(url='localhost', token='000')
 
 netbox_version = ()
 
@@ -781,8 +780,7 @@ for node in data_tree['nodes']:
     for vm in _node_vms:
         current_vm = vm['vmid']
 
-        _vm_config = get_vm_config(node_name=node['node'],
-                                     vm_id=vm['vmid'])
+        _vm_config = get_vm_config(node_name=node['node'], vm_id=vm['vmid'])
         
         print(f'Now processing VM ID {vm["vmid"]} with name {_vm_config["name"]} on node {node["node"]}')
 
